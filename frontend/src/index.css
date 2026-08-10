@@ -2,10 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
 body {
-  background-color: #f5efe8;
+  background-color: #f8f5f2;
+  color: #2e2a27;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible keyboard focus everywhere, on top of Tailwind's focus rings */
+:focus-visible {
+  outline: 2px solid #c68a52;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hide scrollbar on the horizontally-scrolling filter pill row, mobile only */
+.pill-row::-webkit-scrollbar {
+  display: none;
+}
+.pill-row {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
