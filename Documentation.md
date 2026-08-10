@@ -1,179 +1,335 @@
 # Coffee Brew Log
 
-A tiny full-stack app for logging coffee brews at a micro-roastery: create,
-view, filter, edit, and delete brew entries.
+A modern full-stack web application for recording and managing coffee brew recipes at a micro-roastery. Users can create, view, filter, edit, and delete brew entries through a clean, responsive interface.
 
-Built for the XPL Full-Stack Developer Bootcamp assessment.
+This project was developed for the **XPL Full-Stack Developer Bootcamp Assessment**.
 
-## Project description
+---
 
-The app has two parts, kept in separate folders:
+# Live Demo
 
-- **`backend/`** — a JSON API built with **Express**, using **Sequelize**
-  (an ORM) backed by a **SQLite** database. Exposes CRUD endpoints under
-  `/api/brews`.
-- **`frontend/`** — a **React** app (built with Vite) styled with
-  **Tailwind CSS**. Talks to the backend over the JSON API.
+**Frontend:**  
+https://coffee-brew-log-1-4s2f.onrender.com
 
-Each brew entry has: beans, brew method, coffee grams, water grams, a
-rating out of 5, and tasting notes.
+**Backend API:**  
+https://coffee-brew-log-eb81.onrender.com
 
-### Why Sequelize instead of Prisma
+---
 
-The original plan was to use Prisma, but Prisma's CLI needs to download a
-platform-specific query-engine binary from `binaries.prisma.sh` the first
-time you run it, and that domain was blocked in the sandbox this was built
-in — so it couldn't actually be tested there. Sequelize + `sqlite3` needed
-nothing beyond the npm registry, so it was used instead and tested
-end-to-end (every CRUD endpoint, validation path, and status code was
-exercised with real requests before this was handed over). Sequelize still
-satisfies the "ORM backed by a SQL database" requirement.
+# Features
 
-## Tech stack
+- Create new brew entries
+- View all recorded brews
+- Filter brews by brewing method
+- Edit existing brew entries
+- Delete brew entries
+- Responsive user interface
+- Client-side form validation
+- Server-side validation
+- RESTful JSON API
+- Automatic database initialization using Sequelize
 
-- Frontend: React (Vite), Tailwind CSS
-- Backend: Node.js, Express
-- ORM / DB: Sequelize + SQLite
-- Both apps read config from environment variables (see `.env.example` in
-  each folder)
+---
 
-## Project structure
+# Technology Stack
 
-```
+## Frontend
+
+- React
+- Vite
+- Tailwind CSS
+
+## Backend
+
+- Node.js
+- Express
+
+## Database
+
+- SQLite
+- Sequelize ORM
+
+---
+
+# Project Structure
+
+```text
 coffee-brew-log/
 ├── backend/
 │   ├── src/
-│   │   ├── db/sequelize.js       # Sequelize connection
-│   │   ├── models/Brew.js        # Brew model/schema
-│   │   ├── routes/brews.js       # /api/brews CRUD routes
-│   │   ├── routes/validateBrew.js# request validation middleware
-│   │   ├── seed.js               # sample data seeder
-│   │   └── index.js              # Express app entry point
+│   │   ├── db/
+│   │   │   └── sequelize.js
+│   │   ├── models/
+│   │   │   └── Brew.js
+│   │   ├── routes/
+│   │   │   ├── brews.js
+│   │   │   └── validateBrew.js
+│   │   ├── seed.js
+│   │   └── index.js
 │   ├── .env.example
 │   └── package.json
+│
 ├── frontend/
 │   ├── src/
-│   │   ├── api/brews.js          # fetch wrapper for the API
-│   │   ├── components/           # BrewCard, MethodFilter, BrewFormModal, RatingBadge
-│   │   ├── brewMethods.js        # shared list of brew methods
+│   │   ├── api/
+│   │   │   └── brews.js
+│   │   ├── components/
+│   │   ├── brewMethods.js
 │   │   └── App.jsx
 │   ├── .env.example
 │   └── package.json
+│
 ├── Documentation.md
 └── deployment.md
 ```
 
-## Setup instructions
+---
 
-### Prerequisites
+# Project Overview
 
-- Node.js 18+ and npm
+The application consists of two independent services:
 
-### 1. Backend
+## Backend
+
+The backend is built using **Express** and **Sequelize**, exposing a RESTful JSON API under:
+
+```
+/api/brews
+```
+
+It performs:
+
+- CRUD operations
+- Input validation
+- Database communication
+- Error handling
+
+SQLite is used as the relational database, while Sequelize provides object-relational mapping between JavaScript models and SQL tables.
+
+The database schema is created automatically when the application starts using:
+
+```javascript
+sequelize.sync();
+```
+
+---
+
+## Frontend
+
+The frontend is a React application created with Vite and styled using Tailwind CSS.
+
+It communicates with the backend through the REST API and provides:
+
+- Brew list
+- Brew filtering
+- Add/Edit modal
+- Delete confirmation
+- Responsive layout
+- Dynamic page title
+
+---
+
+# Brew Data Model
+
+Each brew contains:
+
+| Field | Description |
+|--------|-------------|
+| Beans | Coffee bean name |
+| Method | Brewing method |
+| Coffee Grams | Amount of coffee used |
+| Water Grams | Amount of water used |
+| Rating | Rating between 0 and 5 |
+| Tasting Notes | User tasting notes |
+
+---
+
+# Local Setup
+
+## Prerequisites
+
+- Node.js 18 or later
+- npm
+
+---
+
+## Backend
 
 ```bash
 cd backend
+
 cp .env.example .env
+
 npm install
-npm run seed     # optional: adds 3 sample brews
-npm run dev       # starts the API on http://localhost:4000
+
+npm run seed
+
+npm run dev
 ```
 
-The first time the server starts it creates `backend/dev.db` (a SQLite
-file) and the `brews` table automatically — no separate migration step
-needed for local dev.
+The backend runs on:
 
-### 2. Frontend
+```
+http://localhost:4000
+```
 
-In a second terminal:
+The first launch automatically creates:
+
+- SQLite database (`dev.db`)
+- Brew table
+
+No manual migrations are required.
+
+---
+
+## Frontend
+
+Open a second terminal.
 
 ```bash
 cd frontend
+
 cp .env.example .env
+
 npm install
-npm run dev       # starts the app on http://localhost:5173
+
+npm run dev
 ```
 
-Open `http://localhost:5173` in your browser. Make sure the backend is
-running first, or the list will show a fetch error.
+The frontend runs on:
 
-### Environment variables
-
-**`backend/.env`**
-
-| Variable       | Description                                  | Example                  |
-|----------------|-----------------------------------------------|---------------------------|
-| `DATABASE_URL` | SQLite file path                              | `file:./dev.db`           |
-| `PORT`         | Port the API listens on                       | `4000`                    |
-| `CORS_ORIGIN`  | Origin allowed to call the API                | `http://localhost:5173`   |
-
-**`frontend/.env`**
-
-| Variable       | Description                                  | Example                       |
-|----------------|-----------------------------------------------|---------------------------------|
-| `VITE_API_URL` | Base URL of the backend API                   | `http://localhost:4000/api`    |
-
-No secrets are hardcoded anywhere in the source — everything environment-
-specific is read from these variables.
-
-## API reference
-
-Base path: `/api/brews`
-
-| Method | Path          | Description                          | Success | Errors             |
-|--------|---------------|---------------------------------------|---------|---------------------|
-| GET    | `/`           | List all brews (newest first)        | 200     | 500                 |
-| GET    | `/?method=X`  | List brews filtered by method        | 200     | 500                 |
-| GET    | `/:id`        | Get a single brew                    | 200     | 400, 404, 500       |
-| POST   | `/`           | Create a brew                        | 201     | 400 (validation), 500 |
-| PUT    | `/:id`        | Update a brew                        | 200     | 400, 404, 500       |
-| DELETE | `/:id`        | Delete a brew                        | 204     | 400, 404, 500       |
-
-A brew object looks like:
-
-```json
-{
-  "id": 1,
-  "beans": "Zimbabwean highlands",
-  "method": "Aeropress",
-  "coffeeGrams": 15,
-  "waterGrams": 200,
-  "rating": 3,
-  "tastingNotes": "Heavy body, soft finish, nutty",
-  "createdAt": "2026-08-10T12:29:16.363Z",
-  "updatedAt": "2026-08-10T12:29:16.363Z"
-}
+```
+http://localhost:5173
 ```
 
-`POST` and `PUT` require every field (`beans`, `method`, `coffeeGrams`,
-`waterGrams`, `rating`, `tastingNotes`) to be present and non-blank;
-`coffeeGrams`/`waterGrams` must be positive numbers and `rating` must be
-between 0 and 5. Missing or invalid fields return `400` with a message
-describing what's wrong.
+Ensure the backend is running before opening the application.
 
-## Frontend features
+---
 
-- **List view** — shows all brews with a color-coded rating badge (red
-  for low, orange for mid, green for high), matching the wireframe.
-- **Filter by method** — dropdown filters the list via the API's
-  `?method=` query param.
-- **Add a brew** — modal form; Save is disabled until every field is
-  filled in.
-- **Edit a brew** — same modal, pre-filled, with a Delete button.
-- **Page title** — the document title is set to `Brews: {count}` and
-  updates whenever the brew count changes.
-- Responsive layout — works at both mobile and desktop widths.
+# Environment Variables
 
-## Testing it locally
+## Backend
 
-With both servers running:
+| Variable | Description | Example |
+|----------|-------------|---------|
+| DATABASE_URL | SQLite database path | file:./dev.db |
+| PORT | API port | 4000 |
+| CORS_ORIGIN | Allowed frontend origin | http://localhost:5173 |
 
-1. Visit `http://localhost:5173` — you should see the 3 seeded brews (or
-   an empty state if you skipped seeding).
-2. Click **Add**, try submitting with a field blank — Save stays
-   disabled.
-3. Fill in all fields and Save — the new brew appears in the list.
-4. Use the method filter dropdown to narrow the list.
-5. Click the edit icon on a brew, change a value, Save — the list
-   updates.
-6. Open a brew for edit and click Delete — it disappears from the list.
+---
+
+## Frontend
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| VITE_API_URL | Backend API URL | http://localhost:4000/api |
+
+All configuration values are loaded from environment variables.
+
+No secrets are hardcoded into the source code.
+
+---
+
+# API Endpoints
+
+Base URL:
+
+```
+/api/brews
+```
+
+| Method | Endpoint | Description | Success |
+|---------|----------|-------------|---------|
+| GET | / | Retrieve all brews | 200 |
+| GET | /?method=V60 | Filter by brew method | 200 |
+| GET | /:id | Retrieve a single brew | 200 |
+| POST | / | Create a brew | 201 |
+| PUT | /:id | Update a brew | 200 |
+| DELETE | /:id | Delete a brew | 204 |
+
+---
+
+# Validation
+
+The backend validates every request before saving data.
+
+Required fields:
+
+- Beans
+- Method
+- Coffee Grams
+- Water Grams
+- Rating
+- Tasting Notes
+
+Validation rules:
+
+- No blank fields
+- Coffee grams must be greater than 0
+- Water grams must be greater than 0
+- Rating must be between 0 and 5
+
+Invalid requests return HTTP **400 Bad Request**.
+
+---
+
+# Frontend Functionality
+
+The application provides:
+
+- Responsive card layout
+- Brew filtering
+- Modal-based create and edit forms
+- Client-side validation
+- Delete confirmation
+- Dynamic browser title:
+
+```
+Brews: {brewCount}
+```
+
+The interface automatically refreshes after every successful create, update, or delete operation.
+
+---
+
+# Local Testing
+
+With both applications running:
+
+1. Open:
+
+```
+http://localhost:5173
+```
+
+2. Verify the brew list loads.
+
+3. Create a new brew.
+
+4. Edit an existing brew.
+
+5. Delete a brew.
+
+6. Filter brews by brewing method.
+
+7. Refresh the page to confirm data persists.
+
+---
+
+# Deployment
+
+The application is deployed on **Render**.
+
+Frontend:
+
+https://coffee-brew-log-1-4s2f.onrender.com
+
+Backend:
+
+https://coffee-brew-log-eb81.onrender.com
+
+---
+
+# License
+
+This project was developed as part of the **XPL Full-Stack Developer Bootcamp Assessment**.
