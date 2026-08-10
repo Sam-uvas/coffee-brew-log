@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { BREW_METHODS } from '../brewMethods';
+import { BREW_METHODS, toTitleCase } from '../brewMethods';
+import { formatRatio } from '../utils/ratio';
+import StarRating from './StarRating';
 
 const EMPTY_FORM = {
   beans: '',
@@ -14,8 +16,13 @@ function isBlank(value) {
   return value === undefined || value === null || String(value).trim() === '';
 }
 
-// Handles both "Add a brew" and "Edit a brew", matching the two
-// wireframe states. `brew` is null for Add, populated for Edit.
+const inputClasses =
+  'w-full rounded-xl border border-espresso-100 bg-white px-3.5 py-2.5 text-sm text-espresso placeholder:text-espresso-200 transition-colors duration-150 focus:border-caramel focus:outline-none focus:ring-2 focus:ring-caramel-100';
+
+const labelClasses = 'mb-1.5 block text-xs font-semibold uppercase tracking-wide text-espresso-400';
+
+// Handles both "Add a brew" and "Edit a brew". `brew` is null for Add,
+// populated for Edit.
 export default function BrewFormModal({ brew, onClose, onSave, onDelete }) {
   const isEdit = Boolean(brew);
   const [form, setForm] = useState(
@@ -81,33 +88,38 @@ export default function BrewFormModal({ brew, onClose, onSave, onDelete }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="animate-overlayIn fixed inset-0 z-50 flex items-center justify-center bg-espresso-900/40 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label={isEdit ? 'Edit a brew' : 'Add a brew'}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
+        className="animate-modalPop max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-6 shadow-lift sm:p-8"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-coffee-900">
-            {isEdit ? 'Edit a brew' : 'Add a brew'}
-          </h2>
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-espresso">
+              {isEdit ? 'Edit a brew' : 'Add a brew'}
+            </h2>
+            <p className="mt-1 text-sm text-espresso-400">
+              {isEdit ? 'Update the details of this cup.' : 'Log the details of this cup.'}
+            </p>
+          </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-xl leading-none text-coffee-600 hover:text-coffee-900"
+            className="rounded-full p-1.5 text-xl leading-none text-espresso-400 transition-colors duration-150 hover:bg-espresso-50 hover:text-espresso"
           >
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="mb-1 block text-sm font-medium text-coffee-800" htmlFor="beans">
+            <label className={labelClasses} htmlFor="beans">
               Beans
             </label>
             <input
@@ -115,25 +127,25 @@ export default function BrewFormModal({ brew, onClose, onSave, onDelete }) {
               type="text"
               value={form.beans}
               onChange={(e) => handleChange('beans', e.target.value)}
-              className="w-full rounded-lg border border-coffee-200 px-3 py-2 text-sm focus:border-coffee-400 focus:outline-none focus:ring-1 focus:ring-coffee-400"
+              className={inputClasses}
               placeholder="e.g. Zimbabwean highlands"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-coffee-800" htmlFor="method">
+            <label className={labelClasses} htmlFor="method">
               Method
             </label>
             <select
               id="method"
               value={form.method}
               onChange={(e) => handleChange('method', e.target.value)}
-              className="w-full rounded-lg border border-coffee-200 bg-white px-3 py-2 text-sm focus:border-coffee-400 focus:outline-none focus:ring-1 focus:ring-coffee-400"
+              className={`${inputClasses} appearance-none bg-white`}
             >
               <option value="">Select a method</option>
               {BREW_METHODS.map((method) => (
                 <option key={method} value={method}>
-                  {method}
+                  {toTitleCase(method)}
                 </option>
               ))}
             </select>
@@ -141,8 +153,8 @@ export default function BrewFormModal({ brew, onClose, onSave, onDelete }) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-coffee-800" htmlFor="coffeeGrams">
-                Coffee grams
+              <label className={labelClasses} htmlFor="coffeeGrams">
+                Coffee (g)
               </label>
               <input
                 id="coffeeGrams"
@@ -150,12 +162,12 @@ export default function BrewFormModal({ brew, onClose, onSave, onDelete }) {
                 min="1"
                 value={form.coffeeGrams}
                 onChange={(e) => handleChange('coffeeGrams', e.target.value)}
-                className="w-full rounded-lg border border-coffee-200 px-3 py-2 text-sm focus:border-coffee-400 focus:outline-none focus:ring-1 focus:ring-coffee-400"
+                className={inputClasses}
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-coffee-800" htmlFor="waterGrams">
-                Water grams
+              <label className={labelClasses} htmlFor="waterGrams">
+                Water (g)
               </label>
               <input
                 id="waterGrams"
@@ -163,28 +175,31 @@ export default function BrewFormModal({ brew, onClose, onSave, onDelete }) {
                 min="1"
                 value={form.waterGrams}
                 onChange={(e) => handleChange('waterGrams', e.target.value)}
-                className="w-full rounded-lg border border-coffee-200 px-3 py-2 text-sm focus:border-coffee-400 focus:outline-none focus:ring-1 focus:ring-coffee-400"
+                className={inputClasses}
               />
             </div>
           </div>
 
+          <div className="flex items-center justify-between rounded-xl bg-cream px-3.5 py-2.5">
+            <span className="text-xs font-semibold uppercase tracking-wide text-espresso-400">
+              Ratio
+            </span>
+            <span className="text-sm font-bold text-sage-600">
+              {formatRatio(form.coffeeGrams, form.waterGrams)}
+            </span>
+          </div>
+
           <div>
-            <label className="mb-1 block text-sm font-medium text-coffee-800" htmlFor="rating">
-              Rating (out of 5)
-            </label>
-            <input
-              id="rating"
-              type="number"
-              min="0"
-              max="5"
-              value={form.rating}
-              onChange={(e) => handleChange('rating', e.target.value)}
-              className="w-full rounded-lg border border-coffee-200 px-3 py-2 text-sm focus:border-coffee-400 focus:outline-none focus:ring-1 focus:ring-coffee-400"
+            <label className={labelClasses}>Rating</label>
+            <StarRating
+              rating={Number(form.rating) || 0}
+              onChange={(value) => handleChange('rating', value)}
+              interactive
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-coffee-800" htmlFor="tastingNotes">
+            <label className={labelClasses} htmlFor="tastingNotes">
               Tasting notes
             </label>
             <input
@@ -192,30 +207,37 @@ export default function BrewFormModal({ brew, onClose, onSave, onDelete }) {
               type="text"
               value={form.tastingNotes}
               onChange={(e) => handleChange('tastingNotes', e.target.value)}
-              className="w-full rounded-lg border border-coffee-200 px-3 py-2 text-sm focus:border-coffee-400 focus:outline-none focus:ring-1 focus:ring-coffee-400"
+              className={inputClasses}
               placeholder="e.g. Heavy body, soft finish, nutty"
             />
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
-          <div className="flex items-center gap-3 pt-1">
+          <div className="flex items-center gap-3 pt-2">
             {isEdit && (
               <button
                 type="button"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
+                className="rounded-full border border-red-300 px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors duration-150 hover:bg-red-50 disabled:opacity-50"
               >
                 {deleting ? 'Deleting…' : 'Delete'}
               </button>
             )}
             <button
+              type="button"
+              onClick={onClose}
+              className="ml-auto rounded-full px-4 py-2.5 text-sm font-semibold text-espresso-400 transition-colors duration-150 hover:bg-espresso-50 hover:text-espresso"
+            >
+              Cancel
+            </button>
+            <button
               type="submit"
               disabled={!isValid || submitting}
-              className="ml-auto rounded-lg bg-coffee-900 px-5 py-2 text-sm font-medium text-white transition hover:bg-coffee-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-full bg-espresso px-6 py-2.5 text-sm font-semibold text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-espresso-900 hover:shadow-card disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none"
             >
-              {submitting ? 'Saving…' : 'Save'}
+              {submitting ? 'Saving…' : isEdit ? 'Save Changes' : 'Save Brew'}
             </button>
           </div>
         </form>
