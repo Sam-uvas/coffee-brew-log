@@ -57,7 +57,7 @@ connection string).
 3. **Build command:** `npm install && npm run build`
 4. **Publish directory:** `dist`
 5. **Environment variables:**
-   - `VITE_API_URL` = `https://<your-backend-url>/api` (from step 2)
+   - `VITE_API_URL` = `https://coffee-brew-log-eb81.onrender.com/api` 
 6. Deploy. Note the frontend URL, e.g.
    `https://coffee-brew-log.onrender.com`.
 
