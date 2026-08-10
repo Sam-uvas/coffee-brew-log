@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
-import BrewCard from './components/BrewCard';
+import Header from './components/Header';
 import MethodFilter from './components/MethodFilter';
+import BrewCard from './components/BrewCard';
 import BrewFormModal from './components/BrewFormModal';
+import EmptyState from './components/EmptyState';
 import { fetchBrews, createBrew, updateBrew, deleteBrew } from './api/brews';
 
 export default function App() {
@@ -9,6 +11,7 @@ export default function App() {
   const [methodFilter, setMethodFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [actionError, setActionError] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBrew, setEditingBrew] = useState(null);
 
@@ -65,45 +68,58 @@ export default function App() {
     await loadBrews(methodFilter);
   }
 
+  // Quick-delete straight from a card, bypassing the modal.
+  async function handleQuickDelete(brew) {
+    const confirmed = window.confirm(`Delete "${brew.beans}" from your brew journal?`);
+    if (!confirmed) return;
+    setActionError('');
+    try {
+      await deleteBrew(brew.id);
+      await loadBrews(methodFilter);
+    } catch (err) {
+      setActionError(err.message || 'Could not delete that brew. Please try again.');
+    }
+  }
+
   return (
-    <div className="mx-auto min-h-screen max-w-md bg-white px-5 py-8 shadow-sm sm:my-8 sm:rounded-3xl sm:border sm:border-coffee-100">
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-coffee-900">Brew log</h1>
-          <p className="text-sm text-coffee-600">Brews: {brews.length}</p>
+    <div className="min-h-screen bg-cream">
+      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8 sm:py-14">
+        <Header onNewBrew={openAddModal} />
+
+        <div className="mt-8">
+          <MethodFilter value={methodFilter} onChange={setMethodFilter} />
         </div>
-        <button
-          type="button"
-          onClick={openAddModal}
-          className="rounded-lg bg-coffee-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-coffee-800"
-        >
-          Add
-        </button>
-      </header>
 
-      <div className="mb-4">
-        <MethodFilter value={methodFilter} onChange={setMethodFilter} />
+        {actionError && (
+          <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{actionError}</p>
+        )}
+
+        <div className="mt-8">
+          {loading && (
+            <p className="py-16 text-center text-sm text-espresso-400">Loading brews…</p>
+          )}
+
+          {!loading && loadError && (
+            <p className="py-16 text-center text-sm text-red-600">{loadError}</p>
+          )}
+
+          {!loading && !loadError && brews.length === 0 && <EmptyState onNewBrew={openAddModal} />}
+
+          {!loading && !loadError && brews.length > 0 && (
+            <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {brews.map((brew, index) => (
+                <BrewCard
+                  key={brew.id}
+                  brew={brew}
+                  onEdit={openEditModal}
+                  onDelete={handleQuickDelete}
+                  style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
-
-      {loading && <p className="py-8 text-center text-sm text-coffee-600">Loading brews…</p>}
-
-      {!loading && loadError && (
-        <p className="py-8 text-center text-sm text-red-600">{loadError}</p>
-      )}
-
-      {!loading && !loadError && brews.length === 0 && (
-        <p className="py-8 text-center text-sm text-coffee-600">
-          No brews yet. Tap "Add" to log your first one.
-        </p>
-      )}
-
-      {!loading && !loadError && brews.length > 0 && (
-        <ul>
-          {brews.map((brew) => (
-            <BrewCard key={brew.id} brew={brew} onEdit={openEditModal} />
-          ))}
-        </ul>
-      )}
 
       {modalOpen && (
         <BrewFormModal
