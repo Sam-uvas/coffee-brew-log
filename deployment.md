@@ -2,17 +2,9 @@
 
 ## Status
 
-This app has **not been deployed to a live URL yet** — deploying requires
-an account on a hosting service (Render, Railway, Fly.io, etc.), which
-isn't something I have access to from this environment. Below are exact,
-tested-locally steps to deploy it yourself on Render's free tier, plus
-notes on what to watch out for.
-
-Once deployed, replace this section with:
-
 ```
-Live app: https://<your-frontend-service>.onrender.com
-Live API: https://<your-backend-service>.onrender.com
+Live app: https://coffee-brew-log-1-4s2f.onrender.com
+Live API: https://coffee-brew-log-eb81.onrender.com
 ```
 
 ## Deploying on Render (recommended)
@@ -58,8 +50,8 @@ connection string).
 4. **Publish directory:** `dist`
 5. **Environment variables:**
    - `VITE_API_URL` = `https://coffee-brew-log-eb81.onrender.com/api` 
-6. Deploy. Note the frontend URL, e.g.
-   `https://coffee-brew-log.onrender.com`.
+6. Deploy. 
+   `https://coffee-brew-log-1-4s2f.onrender.com`
 
 ### 4. Close the loop on CORS
 
